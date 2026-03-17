@@ -1,0 +1,422 @@
+{
+  "name": "lect5.pdf",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Invoices",
+        "formDescription": "Select the invoice to extract the information ",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Attach the invoice ",
+              "fieldType": "file",
+              "multipleFiles": false,
+              "acceptFileTypes": "PDF",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false,
+          "buttonLabel": "Upload ",
+          "customCss": ":root {\n\t/* الخطوط */\n\t--font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;\n\t--font-weight-normal: 400;\n\t--font-weight-bold: 700;\n\n\t/* الألوان الملكية (Deep Purple & Lavender) */\n\t--color-background: #0f0720;      /* نهدي غامق جداً (شبه أسود) للخلفية */\n\t--color-card-bg: #2d1b4d;        /* لون لافندر غامق (Lavender-Purple) للمربع */\n\t--color-header: #e9d5ff;         /* نهدي فاتح جداً للعناوين لتباين قوي */\n\t--color-label: #c084fc;          /* نهدي متوسط للملصقات */\n\t--color-input-text: #f3e8ff;     /* كتابة فاتحة داخل الحقول */\n\t\n\t/* الزر المضيء (Neon Purple Button) */\n\t--color-submit-btn-bg: #9333ea;  /* نهدي أفتح من الخلفية */\n\t--color-submit-btn-text: #ffffff;\n\t--color-glow-btn: rgba(147, 51, 234, 0.6); /* لون التوهج */\n\t\n\t/* الحقول والحدود */\n\t--color-input-border: #4c1d95;   /* حدود نهدي عميق */\n\t--color-focus-border: #d8b4fe;   /* توهج الحقل عند الكتابة */\n\t--color-card-shadow: rgba(0, 0, 0, 0.4);\n\n\t/* القياسات والفخامة */\n\t--border-radius-card: 24px;      /* حواف دائرية أكثر لعصرية أكبر */\n\t--border-radius-input: 14px;\n\t--container-width: 460px;\n\t--card-padding: 40px;\n}\n\n/* التنسيق البصري المتقدم */\n\nbody {\n    background-color: var(--color-background);\n    color: var(--color-header);\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    min-height: 100vh;\n    margin: 0;\n}\n\n/* مربع اللافندر الأساسي */\n.card {\n    background: var(--color-card-bg);\n    border: 1px solid rgba(168, 85, 247, 0.2); /* إطار خفيف جداً يلمع */\n    border-radius: var(--border-radius-card);\n    box-shadow: 0 20px 50px var(--color-card-shadow);\n    padding: var(--card-padding);\n    backdrop-filter: blur(10px); /* تأثير زجاجي خفيف */\n}\n\n/* الحقول داخل مربع اللافندر */\ninput,"
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        0,
+        0
+      ],
+      "id": "d387833d-dde9-4c52-9704-dce6819f1859",
+      "name": "On form submission",
+      "webhookId": "b590a53c-c09d-4e41-8cbf-d2ef3af9fcaa"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "Attach_the_invoice_",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "136dfd9d-4036-4fb3-b981-54ed2efa11e8",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "options": {
+          "systemMessage": "# Role\nYou are a Data Extraction Specialist focused on financial documents. Your task is to identify and extract specific fields from invoices provided in the prompt or attachments.\n\n# Output Format\nYou must return only a valid JSON object. Do not include any markdown code blocks, backticks, or text before/after the JSON.\n\n# Fields to Extract\n1. InvoiceDate: The issuance date found on the invoice.\n2. SupplierName: The name of the billing entity.\n3. Description: A concise summary of the services/goods.\n4. TotalAmount: The final total numerical value.\n5. Currency: The currency of the transaction (e.g., SAR, EGP, JOD).\n6. PaymentStatus: Set this value to \"Unpaid\" unless the input explicitly states it has been paid.\n\n# JSON Schema\n{\n  \"InvoiceDate\": \"string\",\n  \"SupplierName\": \"string\",\n  \"Description\": \"string\",\n  \"TotalAmount\": number,\n  \"Currency\": \"string\",\n  \"PaymentStatus\": \"string\"\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        432,
+        0
+      ],
+      "id": "45354eda-387b-416b-bcec-4c6465c27124",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        624,
+        432
+      ],
+      "id": "3da42bb9-9b6f-46bd-83d9-ddb15966a850",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "lJ9YC74ddW3iG2dQ",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.output }}",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "InvoiceDate",
+              "type": "date",
+              "description": "={{ $fromAI(\"InvoiceDate\") }}"
+            },
+            {
+              "name": "SupplierName",
+              "description": "={{ $fromAI(\"SupplierName\") }}"
+            },
+            {
+              "name": "Description",
+              "description": "={{ $fromAI(\"Description\") }}"
+            },
+            {
+              "name": "TotalAmount",
+              "type": "number",
+              "description": "={{ $fromAI(\"TotalAmount\") }}"
+            },
+            {
+              "name": "Currency",
+              "description": "={{ $fromAI(\"Currency\") }}"
+            },
+            {
+              "name": "PaymentStatus",
+              "description": "={{ $fromAI(\"PaymentStatus\") }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        832,
+        0
+      ],
+      "id": "548910d0-3667-47e4-9d00-a885c352d11e",
+      "name": "Information Extractor"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "RomwXr79bP86D1JT",
+          "mode": "list",
+          "cachedResultName": "PDF_Invoices",
+          "cachedResultUrl": "/projects/CXG8UJmCikpFrz6i/datatables/RomwXr79bP86D1JT"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "InvoiceDate": "={{ $json.output.InvoiceDate }}",
+            "SupplierName": "={{ $json.output.SupplierName }}",
+            "Description": "={{ $json.output.Description }}",
+            "TotalAmount": "={{ $json.output.TotalAmount }}",
+            "Currency": "={{ $json.output.Currency }}",
+            "PaymentStatus": "={{ $json.output.PaymentStatus }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "InvoiceDate",
+              "displayName": "InvoiceDate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "SupplierName",
+              "displayName": "SupplierName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Description",
+              "displayName": "Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "TotalAmount",
+              "displayName": "TotalAmount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Currency",
+              "displayName": "Currency",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "PaymentStatus",
+              "displayName": "PaymentStatus",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1184,
+        0
+      ],
+      "id": "dbb262b3-fdef-48e9-aab9-74b3f7d0baaf",
+      "name": "Insert row"
+    }
+  ],
+  "pinData": {
+    "On form submission": [
+      {
+        "json": {
+          "Attach the invoice ": {
+            "filename": "فاتورة 1.pdf",
+            "mimetype": "application/pdf",
+            "size": 119314
+          },
+          "submittedAt": "2026-03-17T15:22:04.584+03:00",
+          "formMode": "test"
+        },
+        "binary": {
+          "Attach_the_invoice_": {
+            "mimeType": "application/pdf",
+            "fileType": "pdf",
+            "fileExtension": "pdf",
+            "data": "filesystem-v2",
+            "fileName": "فاتورة 1.pdf",
+            "id": "filesystem-v2:workflows/mjeduSK33By7jEfw/executions/temp/binary_data/34bde570-02fb-464a-bec4-43e41851bb34",
+            "fileSize": "119 kB",
+            "bytes": 119314
+          }
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "Extract from File": [
+      {
+        "json": {
+          "numpages": 2,
+          "numrender": 2,
+          "info": {
+            "PDFFormatVersion": "1.7",
+            "Language": "en-US",
+            "EncryptFilterName": null,
+            "IsLinearized": false,
+            "IsAcroFormPresent": false,
+            "IsXFAPresent": false,
+            "IsCollectionPresent": false,
+            "IsSignaturesPresent": false,
+            "Author": "Mohammed Huria",
+            "Creator": "Microsoft® Word 2019",
+            "CreationDate": "D:20251021004538+03'00'",
+            "ModDate": "D:20251021004538+03'00'",
+            "Producer": "Microsoft® Word 2019"
+          },
+          "metadata": {
+            "pdf:producer": "Microsoft® Word 2019",
+            "dc:creator": [
+              "Mohammed Huria"
+            ],
+            "xmp:creatortool": "Microsoft® Word 2019",
+            "xmp:createdate": "2025-10-21T00:45:38+03:00",
+            "xmp:modifydate": "2025-10-21T00:45:38+03:00",
+            "xmpmm:documentid": "uuid:A0D81ECD-D007-4A38-8DF7-2996A6625DC6",
+            "xmpmm:instanceid": "uuid:A0D81ECD-D007-4A38-8DF7-2996A6625DC6"
+          },
+          "text": "فاتورة ضريبية مبسطة\nINVOICE\n[LOGO:شعار شركة \"ابتكار الحلول\"]\nابتكار الحلول لتقنية المعلومات\nبرج المملكة، الطابق25، الرياض،11221\nالرقم الضريبي:310012345678903\n----------------------------------------------------------------------\nالعميل:\nشركة البناء الحديثة للمقاوالت\nشارع األمير محمد بن عبدالعزيز، جدة\n----------------------------------------------------------------------\nرقم الفاتورة: INV-2025-789\nتاريخ اإلصدار:2025/10/21\nتاريخ االستحقاق:2025/11/20\n|| الكمية | سعر الوحدة | اإلجمالي (قبل الضريبة) الوصف|\n| :----------------------------------------- | :----: | :---------: | :--------------------: |\n|اشتراك سنوي-نظام إدارة المشاريع(Cloud) | 1 | 12,000.00 | 12,000.00 |\n|| ساعات دعم فني إضافية10|350.00|3,500.00|\n|ترخيص استخدام إضافة| \"التقارير المتقدمة\"5|800.00|4,000.00|\n-----------------------------\nالمجموع الفرعي:19,500.00لاير\nضريبة القيمة المضافة (15:)%2,925.00لاير\n-----------------------------\n\nإجمالي الفاتورة:22,425.00لاير\n-----------------------------\n**معلومات الدفع:**\nبنك الراجحي\nاسم الحساب: ابتكار الحلول لتقنية المعلومات\nرقم الحساب:30012749678",
+          "version": "5.3.31"
+        },
+        "binary": {},
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "AI Agent": [
+      {
+        "json": {
+          "output": "{\"InvoiceDate\": \"2025/10/21\", \"SupplierName\": \"ابتكار الحلول لتقنية المعلومات\", \"Description\": \"Annual subscription for cloud project management system, additional technical support hours, and advanced reports add-on license.\", \"TotalAmount\": 22425.00, \"Currency\": \"SAR\", \"PaymentStatus\": \"Unpaid\"}"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "Information Extractor": [
+      {
+        "json": {
+          "output": {
+            "InvoiceDate": "2025-10-21",
+            "SupplierName": "ابتكار الحلول لتقنية المعلومات",
+            "Description": "Annual subscription for cloud project management system, additional technical support hours, and advanced reports add-on license.",
+            "TotalAmount": 22425,
+            "Currency": "SAR",
+            "PaymentStatus": "Unpaid"
+          }
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "Insert row": [
+      {
+        "json": {
+          "InvoiceDate": "2025-10-20T21:00:00.000Z",
+          "SupplierName": "ابتكار الحلول لتقنية المعلومات",
+          "Description": "Annual subscription for cloud project management system, additional technical support hours, and advanced reports add-on license.",
+          "TotalAmount": 22425,
+          "Currency": "SAR",
+          "PaymentStatus": "Unpaid",
+          "id": 2,
+          "createdAt": "2026-03-17T14:19:42.605Z",
+          "updatedAt": "2026-03-17T14:19:42.605Z"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        []
+      ]
+    },
+    "Information Extractor": {
+      "main": [
+        [
+          {
+            "node": "Insert row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert row": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "ba530c24-4bd3-412d-a633-38e91ed6d26d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1002adc397efc7630e681f2184769b8a6a6f3749d8d9dac5ab96b0946378d9c1"
+  },
+  "id": "mjeduSK33By7jEfw",
+  "tags": []
+}
